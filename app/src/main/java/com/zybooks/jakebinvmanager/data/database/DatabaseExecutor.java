@@ -111,6 +111,22 @@ public class DatabaseExecutor {
         });
     }
 
+    public void createUser(final User user, final TestUserCallback callback) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Insert the user into the database (Assuming you have a DAO method for this)
+                    userDao.insertUser(user);
+                    callback.onUserCreated();  // Notify success
+                } catch (Exception e) {
+                    callback.onUserCreationFailed();  // Notify failure
+                }
+            }
+        });
+    }
+
+
     // Callback interfaces
     public interface SignUpCallback {
         void onSignUpSuccess();
@@ -130,5 +146,10 @@ public class DatabaseExecutor {
     public interface UserCallback {
         void onUserFetched(User user);
         void onUserFetchedFailed();
+    }
+
+    public interface TestUserCallback {
+        void onUserCreated();
+        void onUserCreationFailed();
     }
 }

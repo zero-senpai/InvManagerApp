@@ -2,6 +2,7 @@ package com.zybooks.jakebinvmanager.controller;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,13 +11,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.zybooks.jakebinvmanager.R;
+import com.zybooks.jakebinvmanager.data.model.Role;
 import com.zybooks.jakebinvmanager.data.model.User;
 import com.zybooks.jakebinvmanager.data.database.DatabaseExecutor;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameEditText, passwordEditText;
-    private Button loginButton, signUpButton;
+    private Button loginButton, signUpButton, createAdminButton;
     private DatabaseExecutor databaseExecutor;
 
     @Override
@@ -29,9 +31,10 @@ public class LoginActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
         signUpButton = findViewById(R.id.signUpButton);
+        createAdminButton = findViewById(R.id.createAdminButton);
 
         // Initialize DatabaseExecutor
-        databaseExecutor = DatabaseExecutor.getInstance(LoginActivity.this);  // Use the getInstance method
+        databaseExecutor = DatabaseExecutor.getInstance(LoginActivity.this);
 
         // Set onClickListener for Login button
         loginButton.setOnClickListener(v -> loginUser());
@@ -41,6 +44,9 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
             startActivity(intent);
         });
+
+        // Set onClickListener for Create Admin button
+        createAdminButton.setOnClickListener(v -> createTestAdminUser());
     }
 
     private void loginUser() {
@@ -58,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onLoginSuccess(User user) {
                 // If login is successful, pass the username to MainActivity
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("username", user.getUsername());  // Pass username for logged-in user
+                intent.putExtra("username", user.getUsername());
                 startActivity(intent);
                 finish();  // Close LoginActivity to prevent going back to it
             }
@@ -66,13 +72,35 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onLoginFailed() {
                 // Post the Toast message to the main thread
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(LoginActivity.this, "Login failed. Invalid username or password.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Login failed. Invalid username or password.", Toast.LENGTH_SHORT).show());
             }
-        });  // Close the loginUser method here with a closing parenthesis
-    } // End of loginUser method
+        });
+    }
+
+    // Create a test Admin user
+    private void createTestAdminUser() {
+        String username = "admin";
+        String email = "admin@admin.com";
+        String password = "admin123";
+        Role role = Role.ADMIN;  // Set role to Admin
+
+        User adminUser = new User(username, email, password, role);  // Create the User object
+
+        // Insert the admin user into the database (ensure that this is done asynchronously)
+        databaseExecutor.createUser(adminUser, new DatabaseExecutor.TestUserCallback() {
+            @Override
+            public void onUserCreated() {
+                // Show success message on UI thread
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Admin user created successfully!", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onUserCreationFailed() {
+                // Show error message on UI thread
+                runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Failed to create admin user", Toast.LENGTH_SHORT).show());
+            }
+
+        });
+    }
+
 }
