@@ -1,4 +1,5 @@
 package com.zybooks.jakebinvmanager.data.model;
+
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -13,15 +14,23 @@ public class Item {
     private long id;
     private String itemName;
     private int quantity;
+    private double serialNumber;  // Updated to double
+    private double price;         // Already double
+    private String photo;
 
-    //Default Constructor for Item class
+    // Default constructor
     public Item() {}
-    public Item(String name, int quantity) {
-        this.itemName = name;
+
+    // Constructor with new fields (including quantity and updated serialNumber as double)
+    public Item(String itemName, double serialNumber, double price, int quantity, String photo) {
+        this.itemName = itemName;
+        this.serialNumber = serialNumber;
+        this.price = price;
         this.quantity = quantity;
+        this.photo = photo;
     }
 
-    //Getters, Setters
+    // Getters and Setters
     public long getId() {
         return id;
     }
@@ -34,8 +43,8 @@ public class Item {
         return itemName;
     }
 
-    public void setItemName(String name) {
-        this.itemName = name;
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
     }
 
     public int getQuantity() {
@@ -46,4 +55,27 @@ public class Item {
         this.quantity = quantity;
     }
 
+    public double getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(double serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
 }

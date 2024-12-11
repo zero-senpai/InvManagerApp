@@ -1,0 +1,45 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/itemNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Item Name" />
+
+    <EditText
+        android:id="@+id/serialNumberEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Serial Number"
+        android:inputType="numberDecimal" /> <!-- Input type for decimal -->
+
+    <EditText
+        android:id="@+id/priceEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Price"
+        android:inputType="numberDecimal" />
+
+    <EditText
+        android:id="@+id/quantityEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Quantity"
+        android:inputType="number" /> <!-- Input type for number -->
+
+    <EditText
+        android:id="@+id/photoEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Photo URL (optional)" />
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save" />
+</LinearLayout>

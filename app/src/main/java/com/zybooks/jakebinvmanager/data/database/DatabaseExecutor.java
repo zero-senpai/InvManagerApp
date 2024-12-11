@@ -7,6 +7,7 @@ import com.zybooks.jakebinvmanager.data.dao.ItemDao;
 import com.zybooks.jakebinvmanager.data.dao.UserDao;
 import com.zybooks.jakebinvmanager.data.model.Item;
 import com.zybooks.jakebinvmanager.data.model.User;
+
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -94,8 +95,21 @@ public class DatabaseExecutor {
         });
     }
 
-
-
+    // Create a new user
+    public void createUser(final User user, final TestUserCallback callback) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Insert the user into the database (Assuming you have a DAO method for this)
+                    userDao.insertUser(user);
+                    callback.onUserCreated();  // Notify success
+                } catch (Exception e) {
+                    callback.onUserCreationFailed();  // Notify failure
+                }
+            }
+        });
+    }
 
     // Fetch all items for display
     public void getItems(final ItemCallback callback) {
@@ -111,16 +125,16 @@ public class DatabaseExecutor {
         });
     }
 
-    public void createUser(final User user, final TestUserCallback callback) {
+    // Method to create an item
+    public void createItem(final Item item, final ItemCreationCallback callback) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    // Insert the user into the database (Assuming you have a DAO method for this)
-                    userDao.insertUser(user);
-                    callback.onUserCreated();  // Notify success
+                    itemDao.insertItem(item);
+                    callback.onItemCreated();  // Notify success
                 } catch (Exception e) {
-                    callback.onUserCreationFailed();  // Notify failure
+                    callback.onItemCreationFailed();  // Notify failure
                 }
             }
         });
@@ -141,6 +155,12 @@ public class DatabaseExecutor {
     public interface ItemCallback {
         void onItemsFetched(List<Item> items);
         void onItemsFetchedFailed();
+    }
+
+    // Callback interface for item creation
+    public interface ItemCreationCallback {
+        void onItemCreated();
+        void onItemCreationFailed();
     }
 
     public interface UserCallback {
