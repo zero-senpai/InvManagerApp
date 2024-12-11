@@ -40,4 +40,12 @@ public interface UserDao {
     // Get users by role
     @Query("SELECT * FROM users WHERE role = :role")
     List<User> getUsersByRole(String role);
+
+    // Get the logged-in user by username (you may set the username during the login session)
+    @Query("SELECT * FROM users WHERE username = :username LIMIT 1")
+    User getLoggedInUser(String username);
+
+    // Get a user by username and password
+    @Query("SELECT * FROM users WHERE username = :username AND password = :password LIMIT 1")
+    User getUserByUsernameAndPassword(String username, String password);
 }

@@ -11,10 +11,10 @@ public class User {
     private String email;
     private String password;
     //Roles: Admin, Manager, and USer
-    private String role;
+    private Role role;
 
 
-    public User(String username, String email, String password, String role) {
+    public User(String username, String email, String password, Role role) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -54,11 +54,11 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

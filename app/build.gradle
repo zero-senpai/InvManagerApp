@@ -37,6 +37,7 @@ dependencies {
     androidTestImplementation libs.espresso.core
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation libs.recyclerview
     annotationProcessor(libs.room.compiler) // Use 'kapt' for annotation processing with Room
 }
 

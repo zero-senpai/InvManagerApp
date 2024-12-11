@@ -15,6 +15,7 @@ public class Item {
     private int quantity;
 
     //Default Constructor for Item class
+    public Item() {}
     public Item(String name, int quantity) {
         this.itemName = name;
         this.quantity = quantity;
