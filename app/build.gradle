@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     implementation libs.recyclerview
+    implementation libs.cardview
     annotationProcessor(libs.room.compiler) // Use 'kapt' for annotation processing with Room
 }
 

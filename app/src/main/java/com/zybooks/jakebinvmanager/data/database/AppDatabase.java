@@ -13,7 +13,7 @@ import com.zybooks.jakebinvmanager.data.dao.UserDao;
 import com.zybooks.jakebinvmanager.data.model.Item;
 import com.zybooks.jakebinvmanager.data.model.User;
 
-@Database(entities = {Item.class, User.class}, version = 2) // Updated version
+@Database(entities = {Item.class, User.class}, version = 3) // Updated version
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
@@ -27,7 +27,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     AppDatabase.class, "inventory_database")
-                            .addMigrations(Migrations.MIGRATION_1_2) // Apply migration
+                            .addMigrations(Migrations.MIGRATION_2_3) // Apply migration
                             .build();
                 }
             }

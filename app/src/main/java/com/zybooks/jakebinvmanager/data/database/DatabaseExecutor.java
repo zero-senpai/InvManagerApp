@@ -126,19 +126,19 @@ public class DatabaseExecutor {
     }
 
     // Method to create an item
-    public void createItem(final Item item, final ItemCreationCallback callback) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    itemDao.insertItem(item);
-                    callback.onItemCreated();  // Notify success
-                } catch (Exception e) {
-                    callback.onItemCreationFailed();  // Notify failure
-                }
+    public void createItem(Item item, ItemCreationCallback callback) {
+        executor.execute(() -> {
+            try {
+                itemDao.insertItem(item); // Ensure this method matches your DAO implementation
+                Log.d("DatabaseExecutor", "Item inserted: " + item.toString());
+                callback.onItemCreated();
+            } catch (Exception e) {
+                Log.e("DatabaseExecutor", "Error inserting item", e);
+                callback.onItemCreationFailed();
             }
         });
     }
+
 
 
     // Callback interfaces

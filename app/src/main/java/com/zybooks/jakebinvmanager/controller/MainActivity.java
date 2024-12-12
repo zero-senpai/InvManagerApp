@@ -2,10 +2,11 @@ package com.zybooks.jakebinvmanager.controller;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import com.zybooks.jakebinvmanager.view.NewItemFragment;
+import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,6 +18,7 @@ import com.zybooks.jakebinvmanager.data.model.Item;
 import com.zybooks.jakebinvmanager.data.model.Role;
 import com.zybooks.jakebinvmanager.data.model.User;
 import com.zybooks.jakebinvmanager.ui.ItemAdapter;
+import com.zybooks.jakebinvmanager.view.NewItemFragment;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ItemAdapter itemAdapter;
     private DatabaseExecutor databaseExecutor;
+    private FrameLayout fragmentContainer;  // Fragment container to hold the Add Item fragment
 
     private User loggedInUser;  // To hold the logged-in user info
 
@@ -39,11 +42,16 @@ public class MainActivity extends AppCompatActivity {
         logoutButton = findViewById(R.id.logoutButton);
         addItemButton = findViewById(R.id.addItemButton); // Add Item button
         recyclerView = findViewById(R.id.recyclerView);
+        fragmentContainer = findViewById(R.id.fragmentContainer); // Get reference to fragment container
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Initialize DatabaseExecutor
         databaseExecutor = DatabaseExecutor.getInstance(this);
+
+        // Initialize ItemAdapter
+        itemAdapter = new ItemAdapter(this, null, Role.USER);  // Initializing with empty list and default role
+        recyclerView.setAdapter(itemAdapter);
 
         // Get logged-in user info from the Intent that started this activity
         Intent intent = getIntent();
@@ -63,7 +71,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Set onClickListener for Add Item button (visible only for ADMIN and MANAGER)
-        addItemButton.setOnClickListener(v -> openNewItemFragment());
+        addItemButton.setOnClickListener(v -> showAddItemFragment());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchItems(); // Ensure this method re-queries the database
     }
 
     private void fetchUserByUsername(String username) {
@@ -100,31 +114,69 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchItems() {
-        // Fetch items from the database via DatabaseExecutor
         databaseExecutor.getItems(new DatabaseExecutor.ItemCallback() {
             @Override
             public void onItemsFetched(List<Item> items) {
-                // Pass the role of the logged-in user to the adapter
-                itemAdapter = new ItemAdapter(MainActivity.this, items, loggedInUser.getRole());
-                recyclerView.setAdapter(itemAdapter);
+                Log.d("MainActivity", "Fetched items: " + items);
+                runOnUiThread(() -> {
+                    // Update the RecyclerView with the fetched items
+                    if (items != null) {
+                        itemAdapter.updateItems(items); // Safely update the adapter
+                        itemAdapter.notifyDataSetChanged();
+                    } else {
+                        // Handle the case where items is null
+                        Toast.makeText(MainActivity.this, "No items found", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onItemsFetchedFailed() {
-                // Show a message if the items fetch fails
-                Toast.makeText(MainActivity.this, "Failed to fetch items", Toast.LENGTH_SHORT).show();
+                Log.e("MainActivity", "Failed to fetch items from database");
+                runOnUiThread(() -> {
+                    Toast.makeText(MainActivity.this, "Failed to fetch items", Toast.LENGTH_SHORT).show();
+                });
             }
         });
     }
 
-    private void openNewItemFragment() {
+    private void showAddItemFragment() {
+        // Hide RecyclerView when fragment is shown
+        recyclerView.setVisibility(View.GONE);
+
+        // Show the fragment container and set its height to match the parent
+        fragmentContainer.setVisibility(View.VISIBLE);
+
         // Create a new instance of NewItemFragment
         NewItemFragment newItemFragment = new NewItemFragment();
 
         // Begin a fragment transaction and replace the current fragment with NewItemFragment
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentContainer, newItemFragment);  // Assume you have a FrameLayout with this id in your layout
+        transaction.replace(R.id.fragmentContainer, newItemFragment);  // Replace fragment container
         transaction.addToBackStack(null);  // Add to back stack to allow navigation
         transaction.commit();
     }
+
+    public void hideAddItemFragment() {
+        // Hide the fragment container again after the item is created or when close is clicked
+        fragmentContainer.setVisibility(View.GONE);
+
+        // Show the RecyclerView again
+        recyclerView.setVisibility(View.VISIBLE);
+
+        // Optionally, remove the fragment
+        getSupportFragmentManager().beginTransaction()
+                .remove(getSupportFragmentManager().findFragmentById(R.id.fragmentContainer))
+                .commit();
+
+        // Refresh RecyclerView to show updated list of items
+        refreshRecyclerView();
+    }
+
+    public void refreshRecyclerView() {
+        // Fetch the latest list of items and refresh the RecyclerView
+        fetchItems();
+    }
 }
+
+

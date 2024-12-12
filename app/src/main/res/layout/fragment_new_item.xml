@@ -4,12 +4,14 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Item Name EditText -->
     <EditText
         android:id="@+id/itemNameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Item Name" />
 
+    <!-- Serial Number EditText -->
     <EditText
         android:id="@+id/serialNumberEditText"
         android:layout_width="match_parent"
@@ -17,6 +19,7 @@
         android:hint="Serial Number"
         android:inputType="numberDecimal" /> <!-- Input type for decimal -->
 
+    <!-- Price EditText -->
     <EditText
         android:id="@+id/priceEditText"
         android:layout_width="match_parent"
@@ -24,6 +27,7 @@
         android:hint="Price"
         android:inputType="numberDecimal" />
 
+    <!-- Quantity EditText -->
     <EditText
         android:id="@+id/quantityEditText"
         android:layout_width="match_parent"
@@ -31,15 +35,25 @@
         android:hint="Quantity"
         android:inputType="number" /> <!-- Input type for number -->
 
+    <!-- Photo URL EditText -->
     <EditText
         android:id="@+id/photoEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Photo URL (optional)" />
 
+    <!-- Save Button -->
     <Button
         android:id="@+id/saveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save" />
+
+    <!-- Close Button -->
+    <Button
+        android:id="@+id/closeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Close"
+        android:layout_marginTop="16dp"/> <!-- Add top margin for spacing -->
 </LinearLayout>

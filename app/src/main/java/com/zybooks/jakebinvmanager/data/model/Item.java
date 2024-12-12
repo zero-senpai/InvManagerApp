@@ -14,21 +14,34 @@ public class Item {
     private long id;
     private String itemName;
     private int quantity;
-    private double serialNumber;  // Updated to double
-    private double price;         // Already double
+    private long serialNumber;
+    private double price;
     private String photo;
 
     // Default constructor
     public Item() {}
 
     // Constructor with new fields (including quantity and updated serialNumber as double)
-    public Item(String itemName, double serialNumber, double price, int quantity, String photo) {
+    public Item(String itemName, long serialNumber, double price, int quantity, String photo) {
         this.itemName = itemName;
         this.serialNumber = serialNumber;
         this.price = price;
         this.quantity = quantity;
         this.photo = photo;
     }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", itemName='" + itemName + '\'' +
+                ", quantity=" + quantity +
+                ", serialNumber=" + serialNumber +
+                ", price=" + price +
+                ", photo='" + photo + '\'' +
+                '}';
+    }
+
 
     // Getters and Setters
     public long getId() {
@@ -55,11 +68,11 @@ public class Item {
         this.quantity = quantity;
     }
 
-    public double getSerialNumber() {
+    public long getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(double serialNumber) {
+    public void setSerialNumber(long serialNumber) {
         this.serialNumber = serialNumber;
     }
 
