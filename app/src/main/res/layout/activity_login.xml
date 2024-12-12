@@ -56,4 +56,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:padding="16dp"/>
 
+    <Button
+        android:id="@+id/createAdminButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Admin User"
+        android:layout_marginTop="16dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

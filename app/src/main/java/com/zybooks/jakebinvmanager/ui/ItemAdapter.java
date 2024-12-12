@@ -1,6 +1,7 @@
 package com.zybooks.jakebinvmanager.ui;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.zybooks.jakebinvmanager.data.model.Item;
 import com.zybooks.jakebinvmanager.data.database.AppDatabase;
 import com.zybooks.jakebinvmanager.data.model.Role;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
@@ -27,9 +29,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
     // Constructor
     public ItemAdapter(Context context, List<Item> itemList, Role userRole) {
         this.context = context;
-        this.items = itemList;
+        this.items = itemList != null ? itemList : new ArrayList<>(); // Initialize as an empty list if null
         this.userRole = userRole;
     }
+
 
     @NonNull
     @Override
@@ -38,13 +41,22 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         return new ItemViewHolder(view);
     }
 
+    /**
+     * Binds data to our UI elements in the layout resource for the item cards
+     * @param holder   The ViewHolder which should be updated to represent the contents of the
+     *                 item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         Item item = items.get(position);
         holder.textViewItemName.setText(item.getItemName());
         holder.textViewItemCount.setText(String.valueOf(item.getQuantity()));
 
-        if (userRole.equals("Admin") || userRole.equals("Manager")) {
+        // Debugging user role to ensure it's correct
+        Log.d("ItemAdapter", "User role: " + userRole);
+
+        if (userRole == Role.ADMIN || userRole == Role.MANAGER) {
             holder.buttonPlus.setVisibility(View.VISIBLE);
             holder.buttonMinus.setVisibility(View.VISIBLE);
 
@@ -69,22 +81,53 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         }
     }
 
+
     @Override
     public int getItemCount() {
-        return items.size();
+        return items != null ? items.size() : 0; // Return 0 if the list is null
     }
 
-    public static class ItemViewHolder extends RecyclerView.ViewHolder {
 
-        TextView textViewItemName, textViewItemCount;
-        Button buttonPlus, buttonMinus;
+    // Method to update the list of items
+    public void updateItems(List<Item> newItems) {
+        if (newItems != null) {
+            this.items.clear();
+            this.items.addAll(newItems);
+            notifyDataSetChanged(); // This will refresh the RecyclerView
+        }
+    }
+
+
+    public class ItemViewHolder extends RecyclerView.ViewHolder {
+        private TextView textViewItemName;
+        private TextView textViewItemCount;
+        private Button buttonPlus;
+        private Button buttonMinus;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
-            textViewItemName = itemView.findViewById(R.id.textViewItemName);
+            textViewItemName = itemView.findViewById(R.id.itemName);
             textViewItemCount = itemView.findViewById(R.id.textViewItemCount);
             buttonPlus = itemView.findViewById(R.id.buttonPlus);
             buttonMinus = itemView.findViewById(R.id.buttonMinus);
+
+            // Handle button clicks for adjusting item quantity
+            buttonPlus.setOnClickListener(v -> updateItemCount(1));  // Increment item count
+            buttonMinus.setOnClickListener(v -> updateItemCount(-1)); // Decrement item count
+        }
+
+        // Method to update item count
+        private void updateItemCount(int change) {
+            int currentCount = Integer.parseInt(textViewItemCount.getText().toString());
+            currentCount += change;
+            // Make sure the item count doesn't go below 0
+            if (currentCount < 0) {
+                currentCount = 0;
+            }
+            textViewItemCount.setText(String.valueOf(currentCount));
+
+            // Optionally update your data model here if necessary
         }
     }
+
 }

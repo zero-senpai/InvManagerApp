@@ -7,6 +7,7 @@ import com.zybooks.jakebinvmanager.data.dao.ItemDao;
 import com.zybooks.jakebinvmanager.data.dao.UserDao;
 import com.zybooks.jakebinvmanager.data.model.Item;
 import com.zybooks.jakebinvmanager.data.model.User;
+
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -94,8 +95,21 @@ public class DatabaseExecutor {
         });
     }
 
-
-
+    // Create a new user
+    public void createUser(final User user, final TestUserCallback callback) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Insert the user into the database (Assuming you have a DAO method for this)
+                    userDao.insertUser(user);
+                    callback.onUserCreated();  // Notify success
+                } catch (Exception e) {
+                    callback.onUserCreationFailed();  // Notify failure
+                }
+            }
+        });
+    }
 
     // Fetch all items for display
     public void getItems(final ItemCallback callback) {
@@ -110,6 +124,22 @@ public class DatabaseExecutor {
             }
         });
     }
+
+    // Method to create an item
+    public void createItem(Item item, ItemCreationCallback callback) {
+        executor.execute(() -> {
+            try {
+                itemDao.insertItem(item); // Ensure this method matches your DAO implementation
+                Log.d("DatabaseExecutor", "Item inserted: " + item.toString());
+                callback.onItemCreated();
+            } catch (Exception e) {
+                Log.e("DatabaseExecutor", "Error inserting item", e);
+                callback.onItemCreationFailed();
+            }
+        });
+    }
+
+
 
     // Callback interfaces
     public interface SignUpCallback {
@@ -127,8 +157,19 @@ public class DatabaseExecutor {
         void onItemsFetchedFailed();
     }
 
+    // Callback interface for item creation
+    public interface ItemCreationCallback {
+        void onItemCreated();
+        void onItemCreationFailed();
+    }
+
     public interface UserCallback {
         void onUserFetched(User user);
         void onUserFetchedFailed();
+    }
+
+    public interface TestUserCallback {
+        void onUserCreated();
+        void onUserCreationFailed();
     }
 }
