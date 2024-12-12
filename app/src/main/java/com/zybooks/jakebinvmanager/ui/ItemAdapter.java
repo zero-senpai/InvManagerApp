@@ -1,6 +1,7 @@
 package com.zybooks.jakebinvmanager.ui;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,13 +41,22 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         return new ItemViewHolder(view);
     }
 
+    /**
+     * Binds data to our UI elements in the layout resource for the item cards
+     * @param holder   The ViewHolder which should be updated to represent the contents of the
+     *                 item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         Item item = items.get(position);
         holder.textViewItemName.setText(item.getItemName());
         holder.textViewItemCount.setText(String.valueOf(item.getQuantity()));
 
-        if (userRole.equals("Admin") || userRole.equals("Manager")) {
+        // Debugging user role to ensure it's correct
+        Log.d("ItemAdapter", "User role: " + userRole);
+
+        if (userRole == Role.ADMIN || userRole == Role.MANAGER) {
             holder.buttonPlus.setVisibility(View.VISIBLE);
             holder.buttonMinus.setVisibility(View.VISIBLE);
 
@@ -70,6 +80,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
             holder.buttonMinus.setVisibility(View.GONE);
         }
     }
+
 
     @Override
     public int getItemCount() {

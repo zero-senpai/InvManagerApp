@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ItemAdapter itemAdapter;
     private DatabaseExecutor databaseExecutor;
     private FrameLayout fragmentContainer;  // Fragment container to hold the Add Item fragment
-
+    private Role userRole;
     private User loggedInUser;  // To hold the logged-in user info
 
     @Override
@@ -48,10 +48,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize DatabaseExecutor
         databaseExecutor = DatabaseExecutor.getInstance(this);
-
-        // Initialize ItemAdapter
-        itemAdapter = new ItemAdapter(this, null, Role.USER);  // Initializing with empty list and default role
-        recyclerView.setAdapter(itemAdapter);
 
         // Get logged-in user info from the Intent that started this activity
         Intent intent = getIntent();
@@ -87,18 +83,14 @@ public class MainActivity extends AppCompatActivity {
             public void onUserFetched(User user) {
                 if (user != null) {
                     loggedInUser = user;
-                    // Fetch items based on logged-in user's role
+                    userRole = loggedInUser.getRole();
                     fetchItems();
 
                     // Show the welcome message on the main thread
                     runOnUiThread(() -> Toast.makeText(MainActivity.this, "Welcome, " + user.getUsername(), Toast.LENGTH_SHORT).show());
 
-                    // Show the "Add Item" button only for ADMIN and MANAGER roles
-                    if (loggedInUser.getRole() == Role.ADMIN || loggedInUser.getRole() == Role.MANAGER) {
-                        addItemButton.setVisibility(View.VISIBLE);
-                    } else {
-                        addItemButton.setVisibility(View.GONE);
-                    }
+                    // Show or hide the "Add Item" button based on the user's role
+                    updateAddItemButtonVisibility();
                 } else {
                     // If user is not found, show the error message on the main thread
                     runOnUiThread(() -> Toast.makeText(MainActivity.this, "User not logged in", Toast.LENGTH_SHORT).show());
@@ -113,18 +105,36 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void updateAddItemButtonVisibility() {
+        // Show the "Add Item" button only for ADMIN and MANAGER roles
+        if (loggedInUser != null && (loggedInUser.getRole() == Role.ADMIN || loggedInUser.getRole() == Role.MANAGER)) {
+            addItemButton.setVisibility(View.VISIBLE);
+        } else {
+            addItemButton.setVisibility(View.GONE);
+        }
+    }
+
     private void fetchItems() {
         databaseExecutor.getItems(new DatabaseExecutor.ItemCallback() {
+
             @Override
             public void onItemsFetched(List<Item> items) {
                 Log.d("MainActivity", "Fetched items: " + items);
+
+                // Initialize the adapter only once (if not already initialized)
+                if (itemAdapter == null) {
+                    itemAdapter = new ItemAdapter(MainActivity.this, items, userRole); // Pass the correct context and role
+                    recyclerView.setAdapter(itemAdapter); // Set the adapter to the RecyclerView
+                } else {
+                    itemAdapter.updateItems(items); // If the adapter is already initialized, update it
+                }
+
                 runOnUiThread(() -> {
                     // Update the RecyclerView with the fetched items
-                    if (items != null) {
-                        itemAdapter.updateItems(items); // Safely update the adapter
-                        itemAdapter.notifyDataSetChanged();
+                    if (items != null && !items.isEmpty()) {
+                        itemAdapter.notifyDataSetChanged(); // This refreshes the RecyclerView
                     } else {
-                        // Handle the case where items is null
+                        // Handle the case where items are null or empty
                         Toast.makeText(MainActivity.this, "No items found", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -178,5 +188,3 @@ public class MainActivity extends AppCompatActivity {
         fetchItems();
     }
 }
-
-
