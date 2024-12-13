@@ -139,12 +139,28 @@ public class DatabaseExecutor {
         });
     }
 
+    public void updateItem(Context context, Item item, UpdateCallback callback) {
+        executor.execute(() -> {
+            try {
+                AppDatabase.getInstance(context).itemDao().updateItem(item);
+                callback.onUpdateSuccess(true);
+            } catch (Exception e) {
+                Log.e("DatabaseExecutor", "Failed to update item", e);
+                callback.onUpdateSuccess(false);
+            }
+        });
+    }
 
 
     // Callback interfaces
     public interface SignUpCallback {
         void onSignUpSuccess();
         void onSignUpFailed();
+    }
+
+    // Callback interface
+    public interface UpdateCallback {
+        void onUpdateSuccess(boolean success);
     }
 
     public interface LoginCallback {

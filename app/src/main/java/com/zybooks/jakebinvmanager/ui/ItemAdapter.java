@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.zybooks.jakebinvmanager.R;
+import com.zybooks.jakebinvmanager.data.database.DatabaseExecutor;
 import com.zybooks.jakebinvmanager.data.model.Item;
 import com.zybooks.jakebinvmanager.data.database.AppDatabase;
 import com.zybooks.jakebinvmanager.data.model.Role;
@@ -53,7 +54,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         holder.textViewItemName.setText(item.getItemName());
         holder.textViewItemCount.setText(String.valueOf(item.getQuantity()));
 
-        // Debugging user role to ensure it's correct
         Log.d("ItemAdapter", "User role: " + userRole);
 
         if (userRole == Role.ADMIN || userRole == Role.MANAGER) {
@@ -63,14 +63,26 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
             holder.buttonPlus.setOnClickListener(v -> {
                 item.setQuantity(item.getQuantity() + 1);
                 holder.textViewItemCount.setText(String.valueOf(item.getQuantity()));
-                AppDatabase.getInstance(context).itemDao().updateItem(item);
+
+                // Update database in background
+                DatabaseExecutor.getInstance(context).updateItem(context, item, success -> {
+                    if (!success) {
+                        Toast.makeText(context, "Failed to update item", Toast.LENGTH_SHORT).show();
+                    }
+                });
             });
 
             holder.buttonMinus.setOnClickListener(v -> {
                 if (item.getQuantity() > 0) {
                     item.setQuantity(item.getQuantity() - 1);
                     holder.textViewItemCount.setText(String.valueOf(item.getQuantity()));
-                    AppDatabase.getInstance(context).itemDao().updateItem(item);
+
+                    // Update database in background
+                    DatabaseExecutor.getInstance(context).updateItem(context, item, success -> {
+                        if (!success) {
+                            Toast.makeText(context, "Failed to update item", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } else {
                     Toast.makeText(context, "Count cannot be negative", Toast.LENGTH_SHORT).show();
                 }
@@ -80,6 +92,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
             holder.buttonMinus.setVisibility(View.GONE);
         }
     }
+
+
 
 
     @Override
