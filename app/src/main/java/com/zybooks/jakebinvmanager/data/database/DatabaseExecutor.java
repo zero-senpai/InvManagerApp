@@ -3,6 +3,7 @@ package com.zybooks.jakebinvmanager.data.database;
 import android.content.Context;
 import android.util.Log;
 
+import com.zybooks.jakebinvmanager.controller.MainActivity;
 import com.zybooks.jakebinvmanager.data.dao.ItemDao;
 import com.zybooks.jakebinvmanager.data.dao.UserDao;
 import com.zybooks.jakebinvmanager.data.model.Item;
@@ -16,6 +17,7 @@ public class DatabaseExecutor {
 
     private static DatabaseExecutor instance;  // Singleton instance
     private static final Executor executor = Executors.newFixedThreadPool(4);  // Executor to run tasks in background
+
     private final UserDao userDao;
     private final ItemDao itemDao;
 
@@ -139,18 +141,57 @@ public class DatabaseExecutor {
         });
     }
 
-    public void updateItem(Context context, Item item, UpdateCallback callback) {
+    public static void updateItem(Context context, Item item, UpdateCallback callback) {
         executor.execute(() -> {
             try {
+                // Perform the database update operation
                 AppDatabase.getInstance(context).itemDao().updateItem(item);
-                callback.onUpdateSuccess(true);
+
+                // On successful update, invoke the callback on the main thread
+                ((MainActivity) context).runOnUiThread(() -> {
+                    callback.onUpdateSuccess();  // Notify success
+                });
             } catch (Exception e) {
                 Log.e("DatabaseExecutor", "Failed to update item", e);
-                callback.onUpdateSuccess(false);
+
+                // On failure, invoke the callback on the main thread
+                ((MainActivity) context).runOnUiThread(() -> {
+                    callback.onUpdateFail();  // Notify failure
+                });
             }
         });
     }
 
+
+    public static void deleteItem(Context context, long itemId, ItemDeleteCallback callback) {
+        executor.execute(() -> {
+            try {
+                // Delete the item from the database
+                AppDatabase.getInstance(context).itemDao().deleteItemById(itemId);
+                Log.d("DatabaseExecutor", "Item deleted: " + itemId);
+
+                // On success, trigger the callback on the UI thread
+                if (callback != null) {
+                    ((MainActivity) context).runOnUiThread(() -> callback.onDeleteSuccess());
+                }
+            } catch (Exception e) {
+                Log.e("DatabaseExecutor", "Error deleting item", e);
+
+                // On failure, trigger the callback on the UI thread
+                if (callback != null) {
+                    ((MainActivity) context).runOnUiThread(() -> callback.onDeleteFail());
+                }
+            }
+        });
+    }
+
+
+
+
+public interface ItemDeleteCallback {
+        void onDeleteSuccess();
+        void onDeleteFail();
+}
 
     // Callback interfaces
     public interface SignUpCallback {
@@ -160,8 +201,10 @@ public class DatabaseExecutor {
 
     // Callback interface
     public interface UpdateCallback {
-        void onUpdateSuccess(boolean success);
+        void onUpdateSuccess();
+        void onUpdateFail();
     }
+
 
     public interface LoginCallback {
         void onLoginSuccess(User user);
