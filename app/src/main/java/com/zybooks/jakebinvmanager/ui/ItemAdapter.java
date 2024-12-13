@@ -1,6 +1,10 @@
 package com.zybooks.jakebinvmanager.ui;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.zybooks.jakebinvmanager.R;
@@ -58,6 +63,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         // Debugging user role to ensure it's correct
         Log.d("ItemAdapter", "User role: " + userRole);
 
+        // Handle the visibility of buttons based on user role (ADMIN or MANAGER)
         if (userRole == Role.ADMIN || userRole == Role.MANAGER) {
             holder.buttonPlus.setVisibility(View.VISIBLE);
             holder.buttonMinus.setVisibility(View.VISIBLE);
@@ -70,8 +76,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
                 DatabaseExecutor.updateItem(context, item, new DatabaseExecutor.UpdateCallback() {
                     @Override
                     public void onUpdateSuccess() {
-                        // UI update is done on the main thread by default
-                        Log.d("ItemAdapter", "Item updated successfully");
+                        // Check if SMS notification should be sent
+                        sendLowStockSmsIfNeeded(item);
                     }
 
                     @Override
@@ -91,7 +97,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
                     DatabaseExecutor.updateItem(context, item, new DatabaseExecutor.UpdateCallback() {
                         @Override
                         public void onUpdateSuccess() {
-                            Log.d("ItemAdapter", "Item updated successfully");
+                            // Check if SMS notification should be sent
+                            sendLowStockSmsIfNeeded(item);
                         }
 
                         @Override
@@ -133,6 +140,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
             holder.buttonMinus.setVisibility(View.GONE);
             holder.buttonDelete.setVisibility(View.GONE);
         }
+
+        // Check if the item quantity is low and send an SMS if necessary
+        sendLowStockSmsIfNeeded(item);
     }
 
     @Override
@@ -146,6 +156,34 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
             this.items.clear();
             this.items.addAll(newItems);
             notifyDataSetChanged(); // This will refresh the RecyclerView
+        }
+    }
+
+    // Method to send SMS notification if the quantity is low and SMS notifications are enabled
+    private void sendLowStockSmsIfNeeded(Item item) {
+        SharedPreferences prefs = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE);
+        boolean isSmsNotificationEnabled = prefs.getBoolean("sms_notification", false);
+
+        if (item.getQuantity() <= 10 && isSmsNotificationEnabled) {
+            sendSmsNotification(item);
+        }
+    }
+
+    // Method to send SMS
+    private void sendSmsNotification(Item item) {
+        // Check for SMS permission
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
+            String phoneNumber = "1234567890"; // Replace with the actual phone number
+            String message = "Item " + item.getItemName() + " has low stock: " + item.getQuantity() + " left.";
+            try {
+                SmsManager smsManager = SmsManager.getDefault();
+                smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+                Log.d("ItemAdapter", "SMS sent successfully");
+            } catch (Exception e) {
+                Log.e("ItemAdapter", "Error sending SMS", e);
+            }
+        } else {
+            Toast.makeText(context, "SMS permission is required to send notifications.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -183,4 +221,3 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         }
     }
 }
-

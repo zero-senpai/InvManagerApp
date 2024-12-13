@@ -1,0 +1,12 @@
+<!-- res/xml/preferences.xml -->
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:key="sms_notification"
+        android:title="Notify by SMS when Items reach 10 or low quantity"
+        android:defaultValue="false"
+        android:summary="Enable SMS notifications for low stock alerts" />
+
+</PreferenceScreen>

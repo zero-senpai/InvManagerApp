@@ -30,7 +30,7 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Fixed Bottom Toolbar with logout and add item buttons -->
+    <!-- Fixed Bottom Toolbar with logout, add item, and settings buttons -->
     <LinearLayout
         android:id="@+id/bottomToolbar"
         android:layout_width="match_parent"
@@ -52,7 +52,7 @@
             android:layout_weight="1"
             android:gravity="start"/>
 
-        <!-- Add Item Button (Right side) -->
+        <!-- Add Item Button (Middle) -->
         <Button
             android:id="@+id/addItemButton"
             android:layout_width="wrap_content"
@@ -60,6 +60,17 @@
             android:text="Add Item"
             android:layout_marginEnd="8dp"
             android:gravity="end"/>
+
+        <!-- Settings Button (Right side) -->
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Settings"
+            android:layout_marginEnd="8dp"
+            android:gravity="end"/>
+
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
