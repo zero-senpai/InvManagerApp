@@ -8,65 +8,84 @@
     app:cardElevation="4dp"
     android:layout_gravity="center">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Item name text -->
-        <TextView
-            android:id="@+id/itemName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="Item Name" />
-
-        <!-- Item details text -->
-        <TextView
-            android:id="@+id/itemDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Details of the item"
-            android:textSize="14sp"
-            android:textColor="#555" />
-
-        <!-- Item count text -->
-        <TextView
-            android:id="@+id/textViewItemCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0"
-            android:textSize="16sp"
-            android:layout_marginTop="8dp" />
-
-        <!-- Buttons for adjusting item quantity -->
+        <!-- Item content -->
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="8dp">
+            android:id="@+id/itemContent"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-            <!-- Minus button -->
-            <Button
-                android:id="@+id/buttonMinus"
+            <!-- Item name text -->
+            <TextView
+                android:id="@+id/itemName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="Item Name" />
+
+            <!-- Item details text -->
+            <TextView
+                android:id="@+id/itemDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Details of the item"
+                android:textSize="14sp"
+                android:textColor="#555" />
+
+            <!-- Item count text -->
+            <TextView
+                android:id="@+id/textViewItemCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="-"
-                android:visibility="gone"
-                android:layout_marginEnd="8dp" />
+                android:text="0"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp" />
 
-            <!-- Plus button -->
-            <Button
-                android:id="@+id/buttonPlus"
+            <!-- Buttons for adjusting item quantity -->
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+"
-                android:visibility="gone"
-                android:layout_marginStart="8dp" />
+                android:gravity="center"
+                android:layout_marginTop="8dp">
 
+                <!-- Minus button -->
+                <Button
+                    android:id="@+id/buttonMinus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:visibility="gone"
+                    android:layout_marginEnd="8dp" />
+
+                <!-- Plus button -->
+                <Button
+                    android:id="@+id/buttonPlus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+"
+                    android:visibility="gone"
+                    android:layout_marginStart="8dp" />
+
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+
+        <!-- "X" button -->
+        <ImageButton
+            android:id="@+id/buttonDelete"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="8dp"
+            android:background="@null"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:contentDescription="Delete Item" />
+    </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

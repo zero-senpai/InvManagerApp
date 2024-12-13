@@ -32,5 +32,8 @@ public interface ItemDao {
     // Query to get a specific item by its ID
     @Query("SELECT * FROM items WHERE id = :itemId")
     Item getItemById(int itemId);
+
+    @Query("DELETE FROM items WHERE id = :id")
+    void deleteItemById(long id);
 }
 

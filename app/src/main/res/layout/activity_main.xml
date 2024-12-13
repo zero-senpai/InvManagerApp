@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,23 +11,26 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/fragmentContainer"/>
+        android:layout_height="0dp"
+        android:paddingBottom="16dp"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/bottomToolbar"/>
 
     <!-- FrameLayout for the fragment container, initially hidden (height 0dp) -->
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/recyclerView"
-        app:layout_constraintBottom_toTopOf="@id/bottomToolbar"
-        android:visibility="gone" /> <!-- Initially hidden -->
+        android:visibility="gone"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Fixed Bottom Toolbar with logout and add item buttons -->
+    <!-- Fixed Bottom Toolbar with logout, add item, and settings buttons -->
     <LinearLayout
         android:id="@+id/bottomToolbar"
         android:layout_width="match_parent"
@@ -48,7 +52,7 @@
             android:layout_weight="1"
             android:gravity="start"/>
 
-        <!-- Add Item Button (Right side) -->
+        <!-- Add Item Button (Middle) -->
         <Button
             android:id="@+id/addItemButton"
             android:layout_width="wrap_content"
@@ -56,6 +60,17 @@
             android:text="Add Item"
             android:layout_marginEnd="8dp"
             android:gravity="end"/>
+
+        <!-- Settings Button (Right side) -->
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Settings"
+            android:layout_marginEnd="8dp"
+            android:gravity="end"/>
+
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

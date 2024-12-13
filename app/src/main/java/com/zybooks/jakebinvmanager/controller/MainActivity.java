@@ -1,6 +1,7 @@
 package com.zybooks.jakebinvmanager.controller;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,6 +9,9 @@ import android.widget.Button;
 import android.widget.Toast;
 import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,12 +23,15 @@ import com.zybooks.jakebinvmanager.data.model.Role;
 import com.zybooks.jakebinvmanager.data.model.User;
 import com.zybooks.jakebinvmanager.ui.ItemAdapter;
 import com.zybooks.jakebinvmanager.view.NewItemFragment;
+import com.zybooks.jakebinvmanager.view.SettingsFragment;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final int SMS_PERMISSION_REQUEST_CODE = 1;
     private Button logoutButton;
+    private Button settingsButton;
     private Button addItemButton;  // Button to add an item
     private RecyclerView recyclerView;
     private ItemAdapter itemAdapter;
@@ -38,10 +45,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //branch: include to ask for the permissions on MainActivity load in
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.SEND_SMS}, SMS_PERMISSION_REQUEST_CODE);
+        }
         // Initialize UI components
         logoutButton = findViewById(R.id.logoutButton);
-        addItemButton = findViewById(R.id.addItemButton); // Add Item button
+        addItemButton = findViewById(R.id.addItemButton);
+        settingsButton = findViewById(R.id.settingsButton);
         recyclerView = findViewById(R.id.recyclerView);
+
         fragmentContainer = findViewById(R.id.fragmentContainer); // Get reference to fragment container
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -68,6 +81,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Set onClickListener for Add Item button (visible only for ADMIN and MANAGER)
         addItemButton.setOnClickListener(v -> showAddItemFragment());
+        // Set click listener for Settings button
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSettingsFragment();
+            }
+        });
     }
 
     @Override
@@ -113,6 +133,51 @@ public class MainActivity extends AppCompatActivity {
             addItemButton.setVisibility(View.GONE);
         }
     }
+
+    private void openSettingsFragment() {
+        // Hide RecyclerView when settings fragment is shown
+        recyclerView.setVisibility(View.GONE);
+
+        // Make the fragment container visible
+        fragmentContainer.setVisibility(View.VISIBLE);
+
+        // Create an instance of SettingsFragment
+        SettingsFragment settingsFragment = new SettingsFragment();
+
+        // Begin a FragmentTransaction to add the fragment dynamically
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        // Replace the current fragment with SettingsFragment inside the fragment container
+        transaction.replace(R.id.fragmentContainer, settingsFragment);
+
+        // Add the transaction to the backstack to allow navigation back
+        transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+
+    public void closeSettingsFragment() {
+        // Hide the fragment container
+        fragmentContainer.setVisibility(View.GONE);
+
+        // Show the RecyclerView again
+        recyclerView.setVisibility(View.VISIBLE);
+
+        // Optionally, remove the fragment
+        getSupportFragmentManager().beginTransaction()
+                .remove(getSupportFragmentManager().findFragmentById(R.id.fragmentContainer))
+                .commit();
+
+        // Refresh RecyclerView to show updated list of items
+        refreshRecyclerView();
+    }
+
+
+
+
+
 
     private void fetchItems() {
         databaseExecutor.getItems(new DatabaseExecutor.ItemCallback() {
@@ -187,4 +252,20 @@ public class MainActivity extends AppCompatActivity {
         // Fetch the latest list of items and refresh the RecyclerView
         fetchItems();
     }
+
+// MainActivity.java
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == SMS_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "SMS permission granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "SMS permission denied. Notifications will not be sent.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }
